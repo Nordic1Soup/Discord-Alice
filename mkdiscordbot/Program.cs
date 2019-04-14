@@ -147,6 +147,8 @@ namespace mkdiscordbot
                 }
             }
 
+            await _client.SetGameAsync("https://github.com/mkaraki/Discord-Alice");
+
             LOCK = false;
         }
 
@@ -221,6 +223,9 @@ namespace mkdiscordbot
 
             if (message.Content == "!ping")
                 await message.Channel.SendMessageAsync("[ALICE CHATTING SUPPORTER] says: pong!");
+
+            if (message.Content == "!github")
+                await message.Channel.SendMessageAsync("https://github.com/mkaraki/Discord-Alice");
 
             if (message.Content == "!langs")
             {
