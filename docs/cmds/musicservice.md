@@ -12,7 +12,7 @@ Usage: `!play <Direct Link for music file>`
 
 |Version|Permission|Limit|
 |:--|:--|:--|
-|[001](/changelog/001.md)|[Everyone](/permissions/permissions.md)|VC Linked TextChannel Only|
+|[001](/Discord-Alice/changelog/001.md)|[Everyone](/Discord-Alice/permissions/permissions.md)|VC Linked TextChannel Only|
 
 **WARN: This feture has not supported youtube link yet**
 
@@ -25,7 +25,7 @@ Usage: `!stop`
 
 |Version|Permission|Limit|
 |:--|:--|:--|
-|[001](/changelog/001.md)|[Everyone](/permissions/permissions.md)|VC Linked TextChannel Only|
+|[001](/Discord-Alice/changelog/001.md)|[Everyone](/Discord-Alice/permissions/permissions.md)|VC Linked TextChannel Only|
 
 **WARN: This command only can use in vc linked chat room**
 
@@ -36,7 +36,7 @@ Usage: `!playing`
 
 |Version|Permission|Limit|
 |:--|:--|:--|
-|[001](/changelog/001.md)|[Everyone](/permissions/permissions.md)|VC Linked TextChannel Only|
+|[001](/Discord-Alice/changelog/001.md)|[Everyone](/Discord-Alice/permissions/permissions.md)|VC Linked TextChannel Only|
 
 **WARN: THIS FETURE CANNOT WORK CORRECTORY**
 
@@ -49,7 +49,7 @@ Usage: `!playing`
 
 |Version|Permission|Limit|
 |:--|:--|:--|
-|[001](/changelog/001.md)|[Everyone](/permissions/permissions.md)|VC Linked TextChannel Only|
+|[001](/Discord-Alice/changelog/001.md)|[Everyone](/Discord-Alice/permissions/permissions.md)|VC Linked TextChannel Only|
 
 **WARN: This command only can use in vc linked chat room**
 

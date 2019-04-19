@@ -9,6 +9,6 @@ Usage: `!grt`
 
 |Version|Permission|Limit|
 |:--|:--|:--|
-|[001](/changelog/001.md)|[Everyone](/permissions/permissions.md)|No|
+|[001](/Discord-Alice/changelog/001.md)|[Everyone](/Discord-Alice/permissions/permissions.md)|No|
 
 Alice will introduce for you.

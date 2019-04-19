@@ -101,6 +101,9 @@ namespace mkdiscordbot
             if (message.Content == "!ping")
                 await message.Channel.SendMessageAsync("[ALICE CHATTING SUPPORTER] says: pong!");
 
+            if (message.Content == "!help")
+                await message.Channel.SendMessageAsync("https://mkaraki.github.io/Discord-Alice/cmds/");
+
             if (message.Content == "!github")
                 await message.Channel.SendMessageAsync("https://github.com/mkaraki/Discord-Alice");
 

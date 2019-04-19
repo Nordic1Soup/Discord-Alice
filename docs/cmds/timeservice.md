@@ -11,7 +11,7 @@ Usage: `!time` or `!time <Mention>`
 
 |Version|Permission|Limit|
 |:--|:--|:--|
-|[001](/changelog/001.md)|[Everyone](/permissions/permissions.md)|No|
+|[001](/Discord-Alice/changelog/001.md)|[Everyone](/Discord-Alice/permissions/permissions.md)|No|
 
 **Before Use This Command:** You or Target have to [set timezone](#settimezone) first.
 
@@ -22,7 +22,7 @@ Usage: `!set timezone <Offset>`
 
 |Version|Permission|Limit|
 |:--|:--|:--|
-|[001](/changelog/001.md)|[Everyone](/permissions/permissions.md)|Offset is required|
+|[001](/Discord-Alice/changelog/001.md)|[Everyone](/Discord-Alice/permissions/permissions.md)|Offset is required|
 
 You should be use [correct offset format](#offsetformat).
 
@@ -44,7 +44,7 @@ Usage: `!set sleep <Time>`
 
 |Version|Permission|Limit|
 |:--|:--|:--|
-|[002](/changelog/002.md)|[Everyone](/permissions/permissions.md)|Time is required|
+|[002](/Discord-Alice/changelog/002.md)|[Everyone](/Discord-Alice/permissions/permissions.md)|Time is required|
 
 **Before Use This Command:** You or Target have to [set timezone](#settimezone) first.
 
