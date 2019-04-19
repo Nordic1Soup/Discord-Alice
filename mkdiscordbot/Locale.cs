@@ -7,14 +7,14 @@ namespace mkdiscordbot
     {
         public static void InitLocaleInfo()
         {
-            Program.L = new Dictionary<string, LocaleDef>();
+            P.L = new Dictionary<string, LocaleDef>();
 
             foreach (string path in System.IO.Directory.GetFiles("Locale", "*-*.json"))
             {
                 string json = System.IO.File.ReadAllText(path);
                 string lname = System.IO.Path.GetFileNameWithoutExtension(path);
                 System.Console.WriteLine($"Loading Locale (\"{lname}\")");
-                Program.L.Add(lname,JsonConvert.DeserializeObject<LocaleDef>(json));
+                P.L.Add(lname,JsonConvert.DeserializeObject<LocaleDef>(json));
             }
         }
     }
@@ -32,6 +32,7 @@ namespace mkdiscordbot
             public string notimezone { get; set; }
             public string nomusicch { get; set; }
             public string unknowncmd { get; set; }
+            public string noadminpermission { get; set; }
         }
 
         public class Someret
@@ -42,6 +43,7 @@ namespace mkdiscordbot
         public class UserSettingReply
         {
             public string timezoneset { get; set; }
+            public string sleeptimeset { get; set; }
         }
 
         public class Information
@@ -53,6 +55,9 @@ namespace mkdiscordbot
             public string playto { get; set; }
             public string playing { get; set; }
             public string notplaying { get; set; }
+            public string turnonrepeat { get; set; }
+            public string turnoffrepeat { get; set; }
+            public string Sleeptime { get; set; }
         }
 
         public class Greeting

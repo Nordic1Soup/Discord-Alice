@@ -7,7 +7,7 @@ namespace mkdiscordbot
         public static void Init()
         {
             string json = System.IO.File.ReadAllText("serverconfig.json");
-            Program.svSettings = JsonConvert.DeserializeObject<ServerSetting>(json);
+            P.S = JsonConvert.DeserializeObject<ServerSetting>(json);
         }
     }
 
@@ -18,6 +18,7 @@ namespace mkdiscordbot
         public Role[] Roles { get; set; }
         public MusicChannel[] MusicChannels { get; set; }
         public string[] InformationLanguage { get; set; }
+        public ulong[] AdminIds { get; set; }
         public ulong GeneralId { get; set; }
         public Nsfwpolice NsfwPolice { get; set; }
         public bool StartMessage { get; set; }

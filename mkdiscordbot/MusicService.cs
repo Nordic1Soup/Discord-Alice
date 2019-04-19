@@ -19,7 +19,7 @@ namespace mkdiscordbot
         {
             bool is_mch = false;
             ulong vcid = 0;
-            foreach (ServerSetting.MusicChannel mc in Program.svSettings.MusicChannels)
+            foreach (ServerSetting.MusicChannel mc in P.S.MusicChannels)
             {
                 if (message.Channel.Id == mc.textid)
                 {
@@ -31,7 +31,7 @@ namespace mkdiscordbot
 
             if (sendmsg && !is_mch)
             {
-                await message.Channel.SendMessageAsync(Program.L[u_loc].ErrorMessages.nomusicch);
+                await message.Channel.SendMessageAsync(P.L[u_loc].ErrorMessages.nomusicch);
             }
 
             return vcid;
@@ -42,7 +42,7 @@ namespace mkdiscordbot
             ulong vcid = await CheckIsMusicCH(message, u_loc, false);
             if (vcid == 0)
             {
-                await message.Channel.SendMessageAsync(Program.L[u_loc].ErrorMessages.unknowncmd);
+                await message.Channel.SendMessageAsync(P.L[u_loc].ErrorMessages.unknowncmd);
                 return;
             }
 
@@ -57,21 +57,21 @@ namespace mkdiscordbot
         {
             ulong vcid = await CheckIsMusicCH(message, u_loc, false);
             if (vcid == 0) {
-                await message.Channel.SendMessageAsync(Program.L[u_loc].ErrorMessages.unknowncmd);
+                await message.Channel.SendMessageAsync(P.L[u_loc].ErrorMessages.unknowncmd);
                 return;
             }
 
             if (PI.ContainsKey(vcid))
-                await message.Channel.SendMessageAsync(Program.L[u_loc].Informations.playing.Replace("%content%", PI[vcid].Name));
+                await message.Channel.SendMessageAsync(P.L[u_loc].Informations.playing.Replace("%content%", PI[vcid].Name));
             else
-                await message.Channel.SendMessageAsync(Program.L[u_loc].Informations.notplaying);
+                await message.Channel.SendMessageAsync(P.L[u_loc].Informations.notplaying);
         }
 
         public static async Task SwitchRepeat(SocketMessage message, string u_loc)
         {
             ulong vcid = await CheckIsMusicCH(message, u_loc, false);
             if (vcid == 0) {
-                await message.Channel.SendMessageAsync(Program.L[u_loc].ErrorMessages.unknowncmd);
+                await message.Channel.SendMessageAsync(P.L[u_loc].ErrorMessages.unknowncmd);
                 return;
             }
 
@@ -80,15 +80,15 @@ namespace mkdiscordbot
                 if (PI[vcid].Repeat)
                 {
                     PI[vcid].Repeat = false;
-                    await message.Channel.SendMessageAsync("No Resource:" + "turnoffrepeat");
+                    await message.Channel.SendMessageAsync(P.L[u_loc].Informations.turnoffrepeat);
                 }
                 else {
                     PI[vcid].Repeat = true;
-                    await message.Channel.SendMessageAsync("No Resource:" + "turnonrepeat");
+                    await message.Channel.SendMessageAsync(P.L[u_loc].Informations.turnonrepeat);
                 }
             }
             else
-                await message.Channel.SendMessageAsync(Program.L[u_loc].ErrorMessages.unknowncmd);
+                await message.Channel.SendMessageAsync(P.L[u_loc].ErrorMessages.unknowncmd);
         }
 
         public static  async Task PlayAudio(SocketMessage message, string u_loc)
@@ -97,10 +97,10 @@ namespace mkdiscordbot
 
             ulong vcid = await CheckIsMusicCH(message, u_loc, true); if (vcid == 0) return;
 
-            if (Program.Guild == null)
+            if (P.Guild == null)
             {
                 var cnl = message.Channel as SocketGuildChannel;
-                Program.Guild = cnl.Guild;
+                P.Guild = cnl.Guild;
             }
 
             Console.WriteLine($"Play to \"{src}\"");
@@ -125,7 +125,7 @@ namespace mkdiscordbot
             else
                 PI.Add(vcid, new PlayingInfo());
 
-            await message.Channel.SendMessageAsync(Program.L[u_loc].Informations.playto.Replace("%content%",pi.Name));
+            await message.Channel.SendMessageAsync(P.L[u_loc].Informations.playto.Replace("%content%",pi.Name));
 
             //await vcsessions[vcid].SetSpeakingAsync(true);
             await SendAsync(vcsessions[vcid], src,vcid);
@@ -159,7 +159,7 @@ namespace mkdiscordbot
         [Command("joinvc", RunMode = RunMode.Async)]
         public static async Task<IAudioClient> JoinVCChannel(ulong id)
         {
-            SocketVoiceChannel channel = Program.Guild.GetVoiceChannel(566490551713529870);
+            SocketVoiceChannel channel = P.Guild.GetVoiceChannel(566490551713529870);
 
             IAudioClient con = await channel.ConnectAsync();
 

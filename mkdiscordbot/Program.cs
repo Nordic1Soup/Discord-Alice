@@ -1,19 +1,15 @@
 ﻿using Discord;
-using Discord.Audio;
-using Discord.Commands;
 using Discord.WebSocket;
-using NYoutubeDL.Options;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text.RegularExpressions;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace mkdiscordbot
 {
-    internal class Program
+    internal class P
     {
-        public static ServerSetting svSettings;
+        public static ServerSetting S;
         public static Dictionary<string, LocaleDef> L;
         public static Dictionary<ulong, UserDictionary> U;
 
@@ -21,7 +17,7 @@ namespace mkdiscordbot
         public static DiscordSocketClient _client;
         public static SocketGuild Guild;
 
-        private static bool LOCK = true;
+        public static bool LOCK = true;
 
         private static void Main(string[] args)
         {
@@ -60,10 +56,10 @@ namespace mkdiscordbot
             }
 
             Console.WriteLine("Loading Alice Core System");
-            new Program().MainAsync().GetAwaiter().GetResult();
+            new P().MainAsync().GetAwaiter().GetResult();
         }
 
-        public Program()
+        public P()
         {
             _client = new DiscordSocketClient();
 
@@ -77,15 +73,15 @@ namespace mkdiscordbot
         {
             string str = "";
 
-            if (svSettings.WelcomeMessage)
+            if (S.WelcomeMessage)
             {
-                foreach (string lang in svSettings.InformationLanguage)
+                foreach (string lang in S.InformationLanguage)
                 {
                     str += $"--- {lang} --------------------\n";
                     str += L[lang].Informations.welcomemsg.Replace("%name%", arg.Username) + "\n";
                 }
 
-                await ((ISocketMessageChannel)_client.GetChannel(svSettings.GeneralId)).SendMessageAsync(str);
+                await ((ISocketMessageChannel)_client.GetChannel(S.GeneralId)).SendMessageAsync(str);
             }
         }
 
@@ -94,37 +90,68 @@ namespace mkdiscordbot
             await _client.LoginAsync(TokenType.Bot, Token);
             await _client.StartAsync();
 
-            Guild = _client.GetGuild(svSettings.ServerID);
+            Guild = _client.GetGuild(S.ServerID);
 
             Console.WriteLine("Type 'exit' to exit");
             while (true)
             {
-                string cmd = Console.ReadLine();
+                string[] cmds = Console.ReadLine().Split(' ');
 
-                switch (cmd)
-                {
-                    case "exit":
-                        LOCK = true;
-                        UserDictionary_Service.Save();
-                        Console.WriteLine("Userdata saved");
-                        if (svSettings.ExitMessage)
+                await Mcmd(cmds.ToList());
+            }
+        }
+
+        public static async Task Mcmd(List<string> cmds)
+        {
+            switch (cmds[0])
+            {
+                case "exit":
+                    LOCK = true;
+                    UserDictionary_Service.Save();
+                    Console.WriteLine("Userdata saved");
+                    if (S.ExitMessage)
+                    {
+                        foreach (ServerSetting.Informationchannel ich in S.InformationChannels)
                         {
-                            foreach (ServerSetting.Informationchannel ich in svSettings.InformationChannels)
-                            {
-                                await ((ISocketMessageChannel)_client.GetChannel(ich.id))
-                                    .SendMessageAsync(L[ich.lang].Informations.shutdown);
-                            }
+                            await ((ISocketMessageChannel)_client.GetChannel(ich.id))
+                                .SendMessageAsync(L[ich.lang].Informations.shutdown);
                         }
-                        Environment.Exit(0);
-                        break;
+                    }
+                    Environment.Exit(0);
+                    break;
 
-                    case "save":
-                        LOCK = true;
-                        UserDictionary_Service.Save();
-                        Console.WriteLine("Userdata saved");
-                        LOCK = false;
-                        break;
-                }
+                case "save":
+                    LOCK = true;
+                    UserDictionary_Service.Save();
+                    Console.WriteLine("Userdata saved");
+                    LOCK = false;
+                    break;
+
+                case "cleanram":
+                    LOCK = true;
+                    UserDictionary_Service.Save();
+                    GC.Collect();
+                    LOCK = false;
+                    break;
+
+                case "clear":
+                    Console.Clear();
+                    break;
+
+                case "broadcast":
+                    List<string> str = cmds.ToList();
+                    str.RemoveAt(0);
+                    string mstr = string.Join(" ", str);
+                    string broadcast_str =
+                        "\n----- There is a broad cast message from bot administrator." +
+                        "\n----- The message language is not translated by Alice Developper Team." +
+                        "\n----- This message is not posted from Alice internal management system." +
+                        "\n" +
+                        "```\n" +
+                        mstr +
+                        "\n```";
+                    await ((ISocketMessageChannel)_client.GetChannel(S.GeneralId)).SendMessageAsync(broadcast_str);
+                    break;
             }
         }
 
@@ -138,9 +165,9 @@ namespace mkdiscordbot
         {
             Console.WriteLine($"Alice connected to Discord service with {_client.CurrentUser}");
 
-            if (svSettings.StartMessage)
+            if (S.StartMessage)
             {
-                foreach (ServerSetting.Informationchannel ich in svSettings.InformationChannels)
+                foreach (ServerSetting.Informationchannel ich in S.InformationChannels)
                 {
                     await ((ISocketMessageChannel)_client.GetChannel(ich.id))
                         .SendMessageAsync(L[ich.lang].Informations.booted);
@@ -152,144 +179,12 @@ namespace mkdiscordbot
             LOCK = false;
         }
 
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
         private async Task MessageReceivedAsync(SocketMessage message)
         {
-            Task.Run(()=> CmdHandle(message));
+            _ = Task.Run(() => Cmds.CmdHandle(message));
         }
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
 
-        private async Task CmdHandle(SocketMessage message)
-        {
-            if (LOCK) return;
-
-            if (message.Author.Id == _client.CurrentUser.Id || message.Author.IsBot)
-                return;
-
-            #region detect_lang
-
-            string u_loc = "";
-
-            foreach (SocketRole role in ((SocketGuildUser)message.Author).Roles)
-            {
-                foreach (ServerSetting.Role srole in svSettings.Roles)
-                {
-                    if (role.Id == srole.id)
-                    {
-                        u_loc = srole.lang;
-                        break;
-                    }
-                }
-                if (u_loc != "") break;
-            }
-
-            if (u_loc == "") u_loc = "en-US";
-
-            #endregion detect_lang
-
-            #region TimeService
-
-            if (Regex.IsMatch(message.Content, "^!set timezone (\\+|-)?[0-9]{1,2}:[0-9]{2}"))
-            {
-                string tzone = Regex.Replace(message.Content, "^!set timezone (\\+)?(?<tzone>(-)?[0-9]{1,2}:[0-9]{2})", "${tzone}");
-                TimeSpan TimeZone = TimeSpan.Parse(tzone);
-                DateTime Now = DateTime.UtcNow.Add(TimeZone);
-                Console.WriteLine($"{message.Author.Username} wants to change Timezone to \"{tzone}\" (Current:{Now.ToShortTimeString()})");
-
-                if (!U.ContainsKey(message.Author.Id))
-                    U.Add(message.Author.Id, new UserDictionary(message.Author.Id));
-                U[message.Author.Id].TimeZone = TimeZone;
-
-                await message.Channel.SendMessageAsync(L[u_loc].UserSettingReplys.timezoneset);
-            }
-
-            if (message.Content == "!time")
-            {
-                await message.Channel.SendMessageAsync(GetUserTime(message.Author.Id, u_loc));
-            }
-
-            if (Regex.IsMatch(message.Content, "^!time <@[0-9]+>"))
-            {
-                ulong uid = ulong.Parse(Regex.Replace(message.Content, "^!time <@(?<tzone>[0-9]+)>", "${tzone}"));
-
-                await message.Channel.SendMessageAsync(GetUserTime(uid, u_loc));
-            }
-
-            if (Regex.IsMatch(message.Content, @"^What time is it now\s?(\.|\?)?\s*$", RegexOptions.IgnoreCase))
-                await message.Channel.SendMessageAsync(GetUserTime(message.Author.Id, u_loc));
-
-            if (Regex.IsMatch(message.Content, @"^(今|いま)、?(何時|なんじ)(。|？|\?)\s*$", RegexOptions.IgnoreCase))
-                await message.Channel.SendMessageAsync(GetUserTime(message.Author.Id, u_loc));
-
-            #endregion TimeService
-
-            if (message.Content == "!ping")
-                await message.Channel.SendMessageAsync("[ALICE CHATTING SUPPORTER] says: pong!");
-
-            if (message.Content == "!github")
-                await message.Channel.SendMessageAsync("https://github.com/mkaraki/Discord-Alice");
-
-            if (message.Content == "!langs")
-            {
-                string msg = "[ALICE LANGUAGE SERVICE]\n```\n";
-
-                msg += string.Join("\n", L.Keys);
-
-                msg += $"\n{L.Count} Language(s) are loaded\n```";
-                await message.Channel.SendMessageAsync(msg);
-            }
-
-            if (message.Content == "!grt")
-                await message.Channel.SendMessageAsync(L[u_loc].Greetings.intro);
-
-            if (message.Content == "Hello" || message.Content == "こんにちは")
-                await message.Channel.SendMessageAsync(L[u_loc].Greetings.hello);
-
-            if (message.Content == "Good Morning" || message.Content == "おはよう")
-                await message.Channel.SendMessageAsync(L[u_loc].Greetings.goodmorning);
-
-            if (message.Content == "Good Night" || message.Content == "おやすみ")
-                await message.Channel.SendMessageAsync(L[u_loc].Greetings.goodnight);
-
-            if (Regex.IsMatch(message.Content, @"^\s*Hello\s?World\s*$", RegexOptions.IgnoreCase))
-                await message.Channel.SendMessageAsync(L[u_loc].Somerets.beepbeep);
-
-            #region MusicService
-
-            if (Regex.IsMatch(message.Content, "^!play .+$"))
-            {
-                await MusicService.PlayAudio(message,u_loc);
-            }
-
-            if (Regex.IsMatch(message.Content, "^!stop$"))
-            {
-                await MusicService.StopAudio(message,u_loc);
-            }
-
-            if (Regex.IsMatch(message.Content, "^!playing$"))
-            {
-                await MusicService.CheckPlaying(message, u_loc);
-            }
-
-            if (Regex.IsMatch(message.Content, "^!repeat$"))
-            {
-                await MusicService.SwitchRepeat(message, u_loc);
-            }
-
-            #endregion MusicService
-        }
-
-
-        public static string GetUserTime(ulong UserId, string loc)
-        {
-            DateTime utc = DateTime.UtcNow;
-            if (!U.ContainsKey(UserId))
-                return L[loc].ErrorMessages.notimezone;
-
-            if (U[UserId].TimeZone == null)
-                return L[loc].ErrorMessages.notimezone;
-
-            DateTime ctime = utc + U[UserId].TimeZone;
-
-            return L[loc].Informations.curtime.Replace("%time%", ctime.ToShortTimeString()).Replace("%zone%", U[UserId].TimeZone.ToString());
-        }
     }
 }
