@@ -11,7 +11,6 @@ namespace mkdiscordbot
     {
         public async static Task CmdHandle(SocketMessage message)
         {
-
             if (P.LOCK) return;
 
             if (message.Author.Id == P._client.CurrentUser.Id || message.Author.IsBot)
