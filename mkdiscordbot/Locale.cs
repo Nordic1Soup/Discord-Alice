@@ -30,6 +30,7 @@ namespace mkdiscordbot
         public class ErrorMessage
         {
             public string notimezone { get; set; }
+            public string nolocationinfo { get; set; }
             public string nomusicch { get; set; }
             public string unknowncmd { get; set; }
             public string noadminpermission { get; set; }
@@ -43,6 +44,7 @@ namespace mkdiscordbot
         public class UserSettingReply
         {
             public string timezoneset { get; set; }
+            public string locinfoset { get; set; }
             public string sleeptimeset { get; set; }
         }
 
@@ -58,6 +60,10 @@ namespace mkdiscordbot
             public string turnonrepeat { get; set; }
             public string turnoffrepeat { get; set; }
             public string Sleeptime { get; set; }
+            public string money { get; set; }
+            public string getmoney { get; set; }
+            public string excinfo { get; set; }
+            public string cweather { get; set; }
         }
 
         public class Greeting

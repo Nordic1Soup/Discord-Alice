@@ -1,0 +1,40 @@
+﻿{
+  "Informations": {
+    //"shutdown": "I will stop life activities for a while.\nI was happy with everyone.\nI look forward to seeing you again.\n\nMessage from Alice.",
+    "shutdown": "Alice will be in the hospital for a while. Until the day we meet again.",
+    "booted": "Alice finaly revived!!!",
+    "welcomemsg": "Welcome %name% !\nAlice welcome you",
+    "curtime": "It's %time% (UTC%zone%)",
+    "playto": "I'll play %content%",
+    "playing": "Currently, I'm playing %content%",
+    "notplaying": "Currently, I'm not palying anything",
+    "turnonrepeat": "I'll turn on repeat playing.",
+    "turnoffrepeat": "I'll turn off repeat playing.",
+    "sleeptime": "Well... I think you should sleep %name%.",
+    "money": "You have %mon% ALS.",
+    "getmoney": "You got %mon% ALS.",
+    "excinfo": "It's %to%.",
+    "cweather": "It's %w%"
+  },
+  "Greetings": {
+    "intro": "Hello. My name is Alice",
+    "hello": "Hello",
+    "goodmorning": "Good Morning",
+    "goodnight": "Good Night"
+  },
+  "UserSettingReplys": {
+    "timezoneset": "I remember your country's timezone",
+    "locinfoset": "I remember your location.",
+    "sleeptimeset": "I'll tell you if you chatting over this time"
+  },
+  "Somerets": {
+    "beepbeep": "Beep Beep"
+  },
+  "ErrorMessages": {
+    "notimezone": "Sorry. Alice don't know your countries time.",
+    "nolocationinfo": "Sorry. Alice don't know where are you live in",
+    "nomusicch": "sorry, I can't play here.",
+    "unknowncmd": "Well... I don't know what you speaking.",
+    "noadminpermission": "You tried to hijack Alice... You are bad boy!"
+  }
+}

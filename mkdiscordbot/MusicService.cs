@@ -12,14 +12,22 @@ namespace mkdiscordbot
 {
     class MusicService
     {
-        public static Dictionary<ulong, IAudioClient> vcsessions = new Dictionary<ulong, IAudioClient>();
-        public static Dictionary<ulong, PlayingInfo> PI = new Dictionary<ulong, PlayingInfo>();
+        public class ServerInfo
+        {
+            public Dictionary<ulong, IAudioClient> vcsessions = new Dictionary<ulong, IAudioClient>();
+            public Dictionary<ulong, PlayingInfo> PI = new Dictionary<ulong, PlayingInfo>();
+        }
+
+        public static Dictionary<ulong, ServerInfo> S = new Dictionary<ulong, ServerInfo>();
+
+        private static ulong Sid(SocketMessage message)
+            => ((SocketGuildChannel)message.Channel).Guild.Id;
 
         public static async Task<ulong> CheckIsMusicCH(SocketMessage message,string u_loc,bool sendmsg)
         {
             bool is_mch = false;
             ulong vcid = 0;
-            foreach (ServerSetting.MusicChannel mc in P.S.MusicChannels)
+            foreach (ServerSetting.MusicChannel mc in P.I[Sid(message)].S.MusicChannels)
             {
                 if (message.Channel.Id == mc.textid)
                 {
@@ -39,6 +47,7 @@ namespace mkdiscordbot
 
         public static async Task StopAudio(SocketMessage message, string u_loc)
         {
+            ulong sid = Sid(message);
             ulong vcid = await CheckIsMusicCH(message, u_loc, false);
             if (vcid == 0)
             {
@@ -46,44 +55,61 @@ namespace mkdiscordbot
                 return;
             }
 
-            if (vcsessions.ContainsKey(vcid))
+            if (!S.ContainsKey(sid)) return;
+
+            if (S[sid].vcsessions.ContainsKey(vcid))
             {
-                await vcsessions[vcid].StopAsync();
-                vcsessions[vcid].Dispose();
+                await S[sid].vcsessions[vcid].StopAsync();
+                S[sid].vcsessions[vcid].Dispose();
             }
         }
 
         public static async Task CheckPlaying(SocketMessage message, string u_loc)
         {
+            ulong sid = Sid(message);
             ulong vcid = await CheckIsMusicCH(message, u_loc, false);
             if (vcid == 0) {
                 await message.Channel.SendMessageAsync(P.L[u_loc].ErrorMessages.unknowncmd);
                 return;
             }
 
-            if (PI.ContainsKey(vcid))
-                await message.Channel.SendMessageAsync(P.L[u_loc].Informations.playing.Replace("%content%", PI[vcid].Name));
+            if (!S.ContainsKey(sid))
+            {
+                await message.Channel.SendMessageAsync(P.L[u_loc].Informations.notplaying);
+                return;
+            }
+
+
+            if (S[sid].PI.ContainsKey(vcid))
+                await message.Channel.SendMessageAsync(P.L[u_loc].Informations.playing.Replace("%content%", S[sid].PI[vcid].Name));
             else
                 await message.Channel.SendMessageAsync(P.L[u_loc].Informations.notplaying);
         }
 
         public static async Task SwitchRepeat(SocketMessage message, string u_loc)
         {
+            ulong sid = Sid(message);
             ulong vcid = await CheckIsMusicCH(message, u_loc, false);
             if (vcid == 0) {
                 await message.Channel.SendMessageAsync(P.L[u_loc].ErrorMessages.unknowncmd);
                 return;
             }
 
-            if (PI.ContainsKey(vcid))
+            if (!S.ContainsKey(sid))
             {
-                if (PI[vcid].Repeat)
+                await message.Channel.SendMessageAsync(P.L[u_loc].ErrorMessages.unknowncmd);
+                return;
+            }
+
+            if (S[sid].PI.ContainsKey(vcid))
+            {
+                if (S[sid].PI[vcid].Repeat)
                 {
-                    PI[vcid].Repeat = false;
+                    S[sid].PI[vcid].Repeat = false;
                     await message.Channel.SendMessageAsync(P.L[u_loc].Informations.turnoffrepeat);
                 }
                 else {
-                    PI[vcid].Repeat = true;
+                    S[sid].PI[vcid].Repeat = true;
                     await message.Channel.SendMessageAsync(P.L[u_loc].Informations.turnonrepeat);
                 }
             }
@@ -93,25 +119,32 @@ namespace mkdiscordbot
 
         public static  async Task PlayAudio(SocketMessage message, string u_loc)
         {
+            ulong sid = Sid(message);
             string src = Regex.Replace(message.Content, "^!play (?<vurl>.+)$", "${vurl}");
 
             ulong vcid = await CheckIsMusicCH(message, u_loc, true); if (vcid == 0) return;
 
-            if (P.Guild == null)
+            if (P.I[sid].Guild == null)
             {
                 var cnl = message.Channel as SocketGuildChannel;
-                P.Guild = cnl.Guild;
+                P.I[sid].Guild = cnl.Guild;
             }
 
             Console.WriteLine($"Play to \"{src}\"");
 
-            if (!vcsessions.ContainsKey(vcid))
-                vcsessions.Add(vcid, await JoinVCChannel(vcid));
+            if (!S.ContainsKey(sid))
+            {
+                S.Add(sid,new ServerInfo());
+                return;
+            }
+
+            if (!S[sid].vcsessions.ContainsKey(vcid))
+                S[sid].vcsessions.Add(vcid, await JoinVCChannel(Sid(message),vcid));
             else
             {
-                await vcsessions[vcid].StopAsync();
-                vcsessions[vcid].Dispose();
-                vcsessions[vcid] = await JoinVCChannel(vcid);
+                await S[sid].vcsessions[vcid].StopAsync();
+                S[sid].vcsessions[vcid].Dispose();
+                S[sid].vcsessions[vcid] = await JoinVCChannel(Sid(message),vcid);
             }
 
             PlayingInfo pi = new PlayingInfo() {
@@ -120,15 +153,15 @@ namespace mkdiscordbot
                 Repeat = true
             };
 
-            if (PI.ContainsKey(vcid))
-                PI[vcid] = new PlayingInfo();
+            if (S[sid].PI.ContainsKey(vcid))
+                S[sid].PI[vcid] = new PlayingInfo();
             else
-                PI.Add(vcid, new PlayingInfo());
+                S[sid].PI.Add(vcid, new PlayingInfo());
 
             await message.Channel.SendMessageAsync(P.L[u_loc].Informations.playto.Replace("%content%",pi.Name));
 
             //await vcsessions[vcid].SetSpeakingAsync(true);
-            await SendAsync(vcsessions[vcid], src,vcid);
+            await SendAsync(S[sid].vcsessions[vcid], src,vcid,sid);
         }
 
         public static Process CreateStream(string path)
@@ -142,7 +175,7 @@ namespace mkdiscordbot
             });
         }
 
-        public static  async Task SendAsync(IAudioClient client, string path,ulong id)
+        public static  async Task SendAsync(IAudioClient client, string path,ulong id,ulong sid)
         {
             do
             {
@@ -153,13 +186,13 @@ namespace mkdiscordbot
                     finally { await discord.FlushAsync(); }
                 }
             }
-            while (PI[id].Repeat);
+            while (S[sid].PI[id].Repeat);
         }
 
         [Command("joinvc", RunMode = RunMode.Async)]
-        public static async Task<IAudioClient> JoinVCChannel(ulong id)
+        public static async Task<IAudioClient> JoinVCChannel(ulong sid,ulong id)
         {
-            SocketVoiceChannel channel = P.Guild.GetVoiceChannel(566490551713529870);
+            SocketVoiceChannel channel = P.I[sid].Guild.GetVoiceChannel(id);
 
             IAudioClient con = await channel.ConnectAsync();
 

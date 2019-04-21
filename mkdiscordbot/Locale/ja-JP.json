@@ -1,0 +1,40 @@
+{
+  "Informations": {
+    //"shutdown": "私は暫くの間、生命活動を停止します。\n私は、みんなとあえて幸せでした。\nまた会えることを楽しみにしています。\n\nアリスからの手紙",
+    "shutdown": "アリスは、しばらく入院します。また会う日まで。",
+    "booted": "アリスはついに生き返ったぞー",
+    "welcomemsg": "ようこそ %name% !\nアリスはあなたを歓迎するよ!",
+    "curtime": "今は %time% (UTC%zone%) だよ",
+    "playto": "これから、%content% を再生するね。",
+    "playing": "いまは、%content%を再生しているよ。",
+    "notplaying": "いまは、何も再生していないよ",
+    "turnonrepeat": "リピート再生するよ。",
+    "turnoffrepeat": "リピート再生をオフにしたよ",
+    "sleeptime": "ねえ%name%、そろそろ寝ないといけないんじゃ・・・",
+    "money": "%mon% ALS 持ってるよ。",
+    "getmoney": "%mon% ALS 手に入れたよ。",
+    "excinfo": "%to% だよ。",
+    "cweather": "%w% だよ。"
+  },
+  "Greetings": {
+    "intro": "こんにちは、私はアリスです。",
+    "hello": "こんにちは",
+    "goodmorning": "おはよう",
+    "goodnight": "おやすみ"
+  },
+  "UserSettingReplys": {
+    "timezoneset": "あなたの国の時間を覚えたよ",
+    "locinfoset": "あなたの居場所を覚えたよ",
+    "sleeptimeset": "あなたが、この時間を超えてもチャットしてたらお知らせするね。"
+  },
+  "Somerets": {
+    "beepbeep": "ピポパポ"
+  },
+  "ErrorMessages": {
+    "notimezone": "ごめんね。アリスはあなたの国の時間を知らないんだ。",
+    "nolocationinfo": "ごめんね。アリスはあなたがどこに住んでいるのか知らないんだ。",
+    "notmusicch": "ごめんね。ここでは流せないの。",
+    "unknowncmd": "えっと、ちょっと何を言っているのか分からないよ。",
+    "noadminpermission": "アリスを乗っ取ろうとするなんて悪い子だね。"
+  }
+}

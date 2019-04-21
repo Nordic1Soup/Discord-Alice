@@ -9,50 +9,60 @@ namespace mkdiscordbot
 {
     internal class P
     {
-        public static ServerSetting S;
+        public static string AliceDataDir;
+        public static string AliceLocaleDir;
+
+        public static Dictionary<ulong, DiscordServerInformation> I;
+
         public static Dictionary<string, LocaleDef> L;
-        public static Dictionary<ulong, UserDictionary> U;
 
         private static string Token;
         public static DiscordSocketClient _client;
-        public static SocketGuild Guild;
 
         public static bool LOCK = true;
 
         private static void Main(string[] args)
         {
-            System.IO.Directory.SetCurrentDirectory(@"C:\Alice_dbgsv");
+            string CDir = System.IO.Directory.GetCurrentDirectory();
+            AliceDataDir = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "Alice_Data");
 
-            if (!System.IO.File.Exists("token"))
+            if (!System.IO.Directory.Exists(AliceDataDir))
             {
-                Console.WriteLine("No Token");
+                System.IO.Directory.CreateDirectory(AliceDataDir);
+                Console.WriteLine("No Alice Data");
                 Environment.Exit(1);
             }
-            Token = System.IO.File.ReadAllText("token");
 
-            if (!System.IO.File.Exists("serverconfig.json"))
-            {
-                Console.WriteLine("No Server settings file");
-                Environment.Exit(1);
-            }
-            if (!System.IO.Directory.Exists("Locale") || System.IO.Directory.GetFiles("Locale", "*-*.json").Length < 1)
+            AliceLocaleDir = System.IO.Path.Combine(CDir, "Locale");
+
+            if (!System.IO.Directory.Exists(AliceLocaleDir) || System.IO.Directory.GetFiles(AliceLocaleDir, "*-*.json").Length < 1)
             {
                 Console.WriteLine("No Locale Files");
                 Environment.Exit(1);
             }
             Console.WriteLine("Applying Server Settings");
-            ServerSetting_Service.Init();
             Locale.InitLocaleInfo();
 
-            if (!System.IO.Directory.Exists("Users"))
-            {
-                System.IO.Directory.CreateDirectory("Users");
-            }
-            UserDictionary_Service.Load();
+            string tokenpath = System.IO.Path.Combine(AliceDataDir, "token");
 
-            if (!System.IO.Directory.Exists("Alice_temporary_service_datas"))
+            if (!System.IO.File.Exists(tokenpath))
             {
-                System.IO.Directory.CreateDirectory("Alice_temporary_service_datas");
+                Console.WriteLine("No Token");
+                Environment.Exit(1);
+            }
+            Token = System.IO.File.ReadAllText(tokenpath);
+
+            string[] serverInfos = System.IO.Directory.GetDirectories(AliceDataDir, "*", System.IO.SearchOption.TopDirectoryOnly);
+            I = new Dictionary<ulong, DiscordServerInformation>();
+            foreach (string svid in serverInfos)
+            {
+                try
+                {
+                    ulong sv = ulong.Parse(System.IO.Path.GetFileName(svid));
+                    I.Add(sv, new DiscordServerInformation(svid));
+                }
+                catch (Exception)
+                { }
             }
 
             Console.WriteLine("Loading Alice Core System");
@@ -73,15 +83,19 @@ namespace mkdiscordbot
         {
             string str = "";
 
-            if (S.WelcomeMessage)
+            ulong sv = arg.Guild.Id;
+
+            if (!I.ContainsKey(sv)) return;
+
+            if (I[sv].S.WelcomeMessage)
             {
-                foreach (string lang in S.InformationLanguage)
+                foreach (string lang in I[sv].S.InformationLanguage)
                 {
                     str += $"--- {lang} --------------------\n";
                     str += L[lang].Informations.welcomemsg.Replace("%name%", arg.Username) + "\n";
                 }
 
-                await ((ISocketMessageChannel)_client.GetChannel(S.GeneralId)).SendMessageAsync(str);
+                await ((ISocketMessageChannel)_client.GetChannel(I[sv].S.GeneralId)).SendMessageAsync(str);
             }
         }
 
@@ -90,7 +104,10 @@ namespace mkdiscordbot
             await _client.LoginAsync(TokenType.Bot, Token);
             await _client.StartAsync();
 
-            Guild = _client.GetGuild(S.ServerID);
+            foreach (DiscordServerInformation dsi in I.Values)
+            {
+                I[dsi.Id].Guild = _client.GetGuild(dsi.Id);
+            }
 
             Console.WriteLine("Type 'exit' to exit");
             while (true)
@@ -107,29 +124,40 @@ namespace mkdiscordbot
             {
                 case "exit":
                     LOCK = true;
-                    UserDictionary_Service.Save();
-                    Console.WriteLine("Userdata saved");
-                    if (S.ExitMessage)
+                    foreach (DiscordServerInformation dsi in I.Values)
                     {
-                        foreach (ServerSetting.Informationchannel ich in S.InformationChannels)
+                        dsi.Save();
+
+                        if (dsi.S.ExitMessage)
                         {
-                            await ((ISocketMessageChannel)_client.GetChannel(ich.id))
-                                .SendMessageAsync(L[ich.lang].Informations.shutdown);
+                            foreach (ServerSetting.Informationchannel ich in dsi.S.InformationChannels)
+                            {
+                                await ((ISocketMessageChannel)_client.GetChannel(ich.id))
+                                    .SendMessageAsync(L[ich.lang].Informations.shutdown);
+                            }
                         }
                     }
+
                     Environment.Exit(0);
                     break;
 
                 case "save":
                     LOCK = true;
-                    UserDictionary_Service.Save();
+                    foreach (DiscordServerInformation dsi in I.Values)
+                        dsi.Save();
                     Console.WriteLine("Userdata saved");
                     LOCK = false;
                     break;
 
+                case "ram":
+                    Console.WriteLine($"RAM: {Environment.WorkingSet.ToString("N0")}");
+                    break;
+
                 case "cleanram":
                     LOCK = true;
-                    UserDictionary_Service.Save();
+                    foreach (DiscordServerInformation dsi in I.Values)
+                        dsi.Save();
+                    Console.WriteLine("GC Collect");
                     GC.Collect();
                     LOCK = false;
                     break;
@@ -150,7 +178,17 @@ namespace mkdiscordbot
                         "```\n" +
                         mstr +
                         "\n```";
-                    await ((ISocketMessageChannel)_client.GetChannel(S.GeneralId)).SendMessageAsync(broadcast_str);
+                    foreach (DiscordServerInformation dsi in I.Values)
+                        await ((ISocketMessageChannel)_client.GetChannel(dsi.S.GeneralId)).SendMessageAsync(broadcast_str);
+                    break;
+
+                case "say":
+                    List<string> say_str = cmds.ToList();
+                    say_str.RemoveAt(0);
+                    ulong chid = ulong.Parse(say_str[0]);
+                    say_str.RemoveAt(0);
+                    string say_mstr = string.Join(" ", say_str);
+                    await ((ISocketMessageChannel)_client.GetChannel(chid)).SendMessageAsync(say_mstr);
                     break;
             }
         }
@@ -165,12 +203,17 @@ namespace mkdiscordbot
         {
             Console.WriteLine($"Alice connected to Discord service with {_client.CurrentUser}");
 
-            if (S.StartMessage)
+            foreach (DiscordServerInformation dsi in I.Values)
             {
-                foreach (ServerSetting.Informationchannel ich in S.InformationChannels)
+                dsi.Save();
+
+                if (dsi.S.StartMessage)
                 {
-                    await ((ISocketMessageChannel)_client.GetChannel(ich.id))
-                        .SendMessageAsync(L[ich.lang].Informations.booted);
+                    foreach (ServerSetting.Informationchannel ich in dsi.S.InformationChannels)
+                    {
+                        await ((ISocketMessageChannel)_client.GetChannel(ich.id))
+                            .SendMessageAsync(L[ich.lang].Informations.booted);
+                    }
                 }
             }
 
@@ -180,11 +223,12 @@ namespace mkdiscordbot
         }
 
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+
         private async Task MessageReceivedAsync(SocketMessage message)
         {
             _ = Task.Run(() => Cmds.CmdHandle(message));
         }
-#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
 
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
     }
 }

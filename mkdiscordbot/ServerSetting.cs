@@ -2,17 +2,14 @@
 
 namespace mkdiscordbot
 {
-    internal class ServerSetting_Service
-    {
-        public static void Init()
-        {
-            string json = System.IO.File.ReadAllText("serverconfig.json");
-            P.S = JsonConvert.DeserializeObject<ServerSetting>(json);
-        }
-    }
-
     internal class ServerSetting
     {
+        public static ServerSetting GetInfo(string Path)
+        {
+            string json = System.IO.File.ReadAllText(Path);
+            return JsonConvert.DeserializeObject<ServerSetting>(json);
+        }
+
         public ulong ServerID { get; set; }
         public Informationchannel[] InformationChannels { get; set; }
         public Role[] Roles { get; set; }
@@ -24,6 +21,8 @@ namespace mkdiscordbot
         public bool StartMessage { get; set; }
         public bool ExitMessage { get; set; }
         public bool WelcomeMessage { get; set; }
+
+        public string OpenWeatherMapAPIKey { get; set; }
 
         public class MusicChannel
         {
