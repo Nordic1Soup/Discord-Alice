@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Discord;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -6,17 +7,26 @@ namespace mkdiscordbot
 {
     class TimeService
     {
-        public static string GetUserTime(ulong sid,ulong UserId, string loc)
+        public static Embed GetUserTime(ulong sid,ulong UserId, string loc)
         {
             DateTime utc = DateTime.UtcNow;
             TimeSpan? tspan = UserTimeZone(sid,UserId);
 
             if (tspan == null)
-                return P.L[loc].ErrorMessages.notimezone;
+                //return P.L[loc].ErrorMessages.notimezone;
+                return new EmbedBuilder() { Description = P.L[loc].ErrorMessages.notimezone }.Build();
 
             DateTime ctime = utc + (tspan ?? TimeSpan.Zero);
 
-            return P.L[loc].Informations.curtime.Replace("%time%", ctime.ToString("yyyy/MM/dd HH:mm")).Replace("%zone%", (tspan ?? TimeSpan.Zero).ToString());
+            EmbedBuilder eb = new EmbedBuilder();
+            eb.Color = Color.Orange;
+            eb.Title = "Time (" + P._client.GetUser(UserId).Username + ")";
+            eb.Description = ctime.ToString("yyyy/MM/dd HH:mm");
+            eb.Footer = new EmbedFooterBuilder();
+            eb.Footer.Text = "UTC"+(tspan ?? TimeSpan.Zero).ToString();
+
+            return eb.Build();
+            //return P.L[loc].Informations.curtime.Replace("%time%", ctime.ToString("yyyy/MM/dd HH:mm")).Replace("%zone%", (tspan ?? TimeSpan.Zero).ToString());
         }
 
         public static TimeSpan? UserTimeZone(ulong sid,ulong id)

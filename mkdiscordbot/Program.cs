@@ -23,9 +23,19 @@ namespace mkdiscordbot
 
         private static void Main(string[] args)
         {
+            Console.WriteLine("Booted Up");
+            Init();
+
+            new P().MainAsync().GetAwaiter().GetResult();
+        }
+
+        public static void Init()
+        {
+            Console.WriteLine("Loading System Config");
             string CDir = System.IO.Directory.GetCurrentDirectory();
             AliceDataDir = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "Alice_Data");
 
+            Console.WriteLine("Checking Config (General)");
             if (!System.IO.Directory.Exists(AliceDataDir))
             {
                 System.IO.Directory.CreateDirectory(AliceDataDir);
@@ -35,23 +45,27 @@ namespace mkdiscordbot
 
             AliceLocaleDir = System.IO.Path.Combine(CDir, "Locale");
 
+            Console.WriteLine("Checking Locale Pack");
             if (!System.IO.Directory.Exists(AliceLocaleDir) || System.IO.Directory.GetFiles(AliceLocaleDir, "*-*.json").Length < 1)
             {
                 Console.WriteLine("No Locale Files");
                 Environment.Exit(1);
             }
             Console.WriteLine("Applying Server Settings");
+            Console.WriteLine("Loading Locale Pack");
             Locale.InitLocaleInfo();
 
             string tokenpath = System.IO.Path.Combine(AliceDataDir, "token");
-
+            Console.WriteLine("Checking Config (token)");
             if (!System.IO.File.Exists(tokenpath))
             {
                 Console.WriteLine("No Token");
                 Environment.Exit(1);
             }
+            Console.WriteLine("Loading Config (token)");
             Token = System.IO.File.ReadAllText(tokenpath);
 
+            Console.WriteLine("Loading Config (Server)");
             string[] serverInfos = System.IO.Directory.GetDirectories(AliceDataDir, "*", System.IO.SearchOption.TopDirectoryOnly);
             I = new Dictionary<ulong, DiscordServerInformation>();
             foreach (string svid in serverInfos)
@@ -59,6 +73,7 @@ namespace mkdiscordbot
                 try
                 {
                     ulong sv = ulong.Parse(System.IO.Path.GetFileName(svid));
+                    Console.WriteLine($"Loading Server Config ({sv})");
                     I.Add(sv, new DiscordServerInformation(svid));
                 }
                 catch (Exception)
@@ -66,7 +81,6 @@ namespace mkdiscordbot
             }
 
             Console.WriteLine("Loading Alice Core System");
-            new P().MainAsync().GetAwaiter().GetResult();
         }
 
         public P()
@@ -190,6 +204,14 @@ namespace mkdiscordbot
                     string say_mstr = string.Join(" ", say_str);
                     await ((ISocketMessageChannel)_client.GetChannel(chid)).SendMessageAsync(say_mstr);
                     break;
+
+                case "reload":
+                    Console.WriteLine("Reload Server Settings");
+                    LOCK = true;
+                    Init();
+                    LOCK = false;
+                    Console.WriteLine("Reloaded (Token is not updated)");
+                    break;
             }
         }
 
@@ -205,8 +227,6 @@ namespace mkdiscordbot
 
             foreach (DiscordServerInformation dsi in I.Values)
             {
-                dsi.Save();
-
                 if (dsi.S.StartMessage)
                 {
                     foreach (ServerSetting.Informationchannel ich in dsi.S.InformationChannels)

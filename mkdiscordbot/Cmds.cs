@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -63,6 +64,21 @@ namespace mkdiscordbot
                 await P.Mcmd(cmd.ToList());
             }
 
+            #region Translater
+
+            if (message.Content.StartsWith("!trans "))
+            {
+                List<string> cmd = Regex.Replace(message.Content, @"^!trans (?<dst>[a-z]{2}) (?<txt>.+)$", "${dst};${txt}").Split(';').ToList();
+
+                string dst = cmd[0];
+                cmd.RemoveAt(0);
+                string txt = string.Join(';',cmd);
+
+                await message.Channel.SendMessageAsync(Translate.TranslateUrl(sid,txt,dst,true));
+            }
+
+            #endregion Translater
+
             #region TimeService
 
             if (TimeService.UserHavetoSleep(sid, message.Author.Id))
@@ -88,21 +104,21 @@ namespace mkdiscordbot
 
             if (message.Content == "!time")
             {
-                await message.Channel.SendMessageAsync(TimeService.GetUserTime(sid, message.Author.Id, u_loc));
+                await message.Channel.SendMessageAsync("",false,TimeService.GetUserTime(sid, message.Author.Id, u_loc));
             }
 
             if (Regex.IsMatch(message.Content, "^!time <@[0-9]+>"))
             {
                 ulong uid = ulong.Parse(Regex.Replace(message.Content, "^!time <@(?<tzone>[0-9]+)>", "${tzone}"));
 
-                await message.Channel.SendMessageAsync(TimeService.GetUserTime(sid, uid, u_loc));
+                await message.Channel.SendMessageAsync("", false, TimeService.GetUserTime(sid, uid, u_loc));
             }
 
             if (Regex.IsMatch(message.Content, @"^What time is it now\s?(\.|\?)?\s*$", RegexOptions.IgnoreCase))
-                await message.Channel.SendMessageAsync(TimeService.GetUserTime(sid, message.Author.Id, u_loc));
+                await message.Channel.SendMessageAsync("", false, TimeService.GetUserTime(sid, message.Author.Id, u_loc));
 
             if (Regex.IsMatch(message.Content, @"^(今|いま)、?(何時|なんじ)(。|？|\?)\s*$", RegexOptions.IgnoreCase))
-                await message.Channel.SendMessageAsync(TimeService.GetUserTime(sid, message.Author.Id, u_loc));
+                await message.Channel.SendMessageAsync("", false, TimeService.GetUserTime(sid, message.Author.Id, u_loc));
 
             if (Regex.IsMatch(message.Content, "^!set sleep [0-9]{1,2}:[0-9]{2}"))
             {

@@ -12,8 +12,9 @@ namespace mkdiscordbot
         {
             DPath = Path;
             UPath = System.IO.Path.Combine(DPath, "Users");
-            Id = ulong.Parse(System.IO.Path.GetFileName(Path));
             S = ServerSetting.GetInfo(System.IO.Path.Combine(DPath,"serverconfig.json"));
+            Id = S.ServerID;
+            Console.WriteLine($"Loading Server User Data");
             U = UserDictionary.Get(UPath);
         }
 

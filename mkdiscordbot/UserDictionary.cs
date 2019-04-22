@@ -21,7 +21,7 @@ namespace mkdiscordbot
             {
                 string json = System.IO.File.ReadAllText(path);
                 ulong UserId = ulong.Parse(System.IO.Path.GetFileNameWithoutExtension(path));
-                Console.WriteLine($"Loading User Settings (\"{UserId}\")");
+                Console.WriteLine($"Loading User Settings ({UserId})");
                 toret.Add(UserId, JsonConvert.DeserializeObject<UserDictionary>(json));
             }
 
@@ -34,6 +34,7 @@ namespace mkdiscordbot
             {
                 string json = JsonConvert.SerializeObject(ud);
                 System.IO.File.WriteAllText(System.IO.Path.Combine(Path, $"{ud.Id}.json"), json);
+                Console.WriteLine($"Saved User Settings ({ud.Id})");
             }
         }
 

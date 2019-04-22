@@ -13,7 +13,7 @@ namespace mkdiscordbot
             {
                 string json = System.IO.File.ReadAllText(path);
                 string lname = System.IO.Path.GetFileNameWithoutExtension(path);
-                System.Console.WriteLine($"Loading Locale (\"{lname}\")");
+                System.Console.WriteLine($"Loading Locale ({lname})");
                 P.L.Add(lname,JsonConvert.DeserializeObject<LocaleDef>(json));
             }
         }

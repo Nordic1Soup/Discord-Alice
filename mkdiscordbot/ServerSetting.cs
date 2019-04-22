@@ -23,6 +23,7 @@ namespace mkdiscordbot
         public bool WelcomeMessage { get; set; }
 
         public string OpenWeatherMapAPIKey { get; set; }
+        public string GASTranslater { get; set; }
 
         public class MusicChannel
         {
