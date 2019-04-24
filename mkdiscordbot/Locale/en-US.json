@@ -34,7 +34,7 @@
     "notimezone": "Sorry. Alice don't know your countries time.",
     "nolocationinfo": "Sorry, Alice doesn't know where you live.",
     "nomusicch": "sorry, I can't play here.",
-    "unknowncmd": "Well... I don't know what you speaking.",
+    "unknowncmd": "I don't know what your trying to say",
     "noadminpermission": "You tried to hijack Alice... You are a bad boy!"
   }
 }
