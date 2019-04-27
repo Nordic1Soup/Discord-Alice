@@ -1,7 +1,7 @@
 ﻿{
   "Informations": {
     //"shutdown": "I will stop life activities for a while.\nI was happy with everyone.\nI look forward to seeing you again.\n\nMessage from Alice.",
-    "shutdown": "Alice will be in the hospital for a while. Until the day we meet again.",
+    "shutdown": "Alice will be in the hospital for a while, until the day we meet again.",
     "booted": "Alice finaly revived!!!",
     "welcomemsg": "Welcome %name% !\nAlice welcome you",
     "curtime": "It's %time% (UTC%zone%)",
