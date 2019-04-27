@@ -1,40 +1,40 @@
 ﻿{
   "Informations": {
     //"shutdown": "I will stop life activities for a while.\nI was happy with everyone.\nI look forward to seeing you again.\n\nMessage from Alice.",
-    "shutdown": "Alice will be in the hospital for a while, until the day we meet again.",
-    "booted": "Alice finaly revived!!!",
-    "welcomemsg": "Welcome %name% !\nAlice welcome you",
-    "curtime": "It's %time% (UTC%zone%)",
-    "playto": "I'll play %content%",
-    "playing": "Currently, I'm playing %content%",
-    "notplaying": "Currently, I'm not palying anything",
-    "turnonrepeat": "I'll turn on repeat playing.",
-    "turnoffrepeat": "I'll turn off repeat playing.",
-    "sleeptime": "Well... I think you should sleep %name%.",
-    "money": "You have %mon% ALS.",
-    "getmoney": "You got %mon% ALS.",
-    "excinfo": "It's %to%.",
-    "cweather": "It's %w%"
+    "shutdown": "i will be in the hospital for a while, until the day we meet again.",
+    "booted": "i finaly revived!!!",
+    "welcomemsg": "welcome %name% !\ni welcome you!",
+    "curtime": "the current time is %time% (UTC%zone%)",
+    "playto": "i will play %content%",
+    "playing": "currently, i am playing %content%",
+    "notplaying": "currently, i am not playing anything",
+    "turnonrepeat": "i will turn on repeat playing.",
+    "turnoffrepeat": "i will turn off repeat playing.",
+    "sleeptime": "well... i think you should sleep %name%.",
+    "money": "you have %mon% ALS.",
+    "getmoney": "you got %mon% ALS.",
+    "excinfo": "it is %to%.",
+    "cweather": "it is %w%"
   },
   "Greetings": {
-    "intro": "Hello. My name is Alice",
-    "hello": "Hello",
-    "goodmorning": "Good Morning",
-    "goodnight": "Good Night"
+    "intro": "hello. my name is alice",
+    "hello": "hello",
+    "goodmorning": "good morning",
+    "goodnight": "good night"
   },
   "UserSettingReplys": {
-    "timezoneset": "I remember your country's timezone",
-    "locinfoset": "I remember your location.",
-    "sleeptimeset": "I'll tell you if you chatting over this time"
+    "timezoneset": "i will remember your country's timezone",
+    "locinfoset": "i will remember your location.",
+    "sleeptimeset": "i will tell you if you chatting over this time"
   },
   "Somerets": {
     "beepbeep": "Beep Beep"
   },
   "ErrorMessages": {
-    "notimezone": "Sorry. Alice don't know your countries time.",
-    "nolocationinfo": "Sorry, Alice doesn't know where you live.",
-    "nomusicch": "sorry, I can't play here.",
-    "unknowncmd": "I don't know what your trying to say",
-    "noadminpermission": "You tried to hijack Alice... You are a bad boy!"
+    "notimezone": "sorry. i don't know your country's time.",
+    "nolocationinfo": "sorry, i don't know where you live.",
+    "nomusicch": "sorry, i can't play here.",
+    "unknowncmd": "i don't know what your trying to say",
+    "noadminpermission": "you tried to hijack me... you are a bad boy!"
   }
 }
